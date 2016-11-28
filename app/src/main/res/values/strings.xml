@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CameraDemo</string>
+    <string name="camera_alert">Device has only one camera!</string>
+</resources>
