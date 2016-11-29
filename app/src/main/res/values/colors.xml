@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="control_background">#cc4285f4</color>
+
+    <color name="sdk_gray_60_color">#99000000</color>
+    <color name="sdk_black_30_color">#4c000000</color>
 </resources>

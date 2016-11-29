@@ -1,7 +1,10 @@
 package com.lzp.camerademo;
 
+import android.app.Activity;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import java.io.IOException;
@@ -18,7 +21,9 @@ public class CameraManager {
     private static CameraManager mCameraInterface;
     private boolean isPreviewing = false;
 
+    private AutoFocusManager mAutoFocusManager;
     private Camera mCamera;
+    private int mCameraID;
 
     private CameraManager() {
 
@@ -31,11 +36,16 @@ public class CameraManager {
         return mCameraInterface;
     }
 
-    public void doOpenCamera() {
-        mCamera = Camera.open();
+    public int getCameraID() {
+        return mCameraID;
     }
 
-    public void doStartPreview(SurfaceHolder holder, int width, int height) {
+    public void doOpenCamera(int cameraId) {
+        mCameraID = cameraId;
+        mCamera = Camera.open(cameraId);
+    }
+
+    public void doStartPreview(Activity activity, SurfaceHolder holder, int width, int height) {
         if (isPreviewing) {
             mCamera.stopPreview();
             return;
@@ -46,11 +56,11 @@ public class CameraManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            initCamera(width, height);
+            initCamera(activity, width, height);
         }
     }
 
-    private void initCamera(int previewWidth, int previewHeight) {
+    private void initCamera(Activity activity, int previewWidth, int previewHeight) {
         if (mCamera != null) {
             Camera.Parameters parameters = mCamera.getParameters();
             List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
@@ -71,10 +81,45 @@ public class CameraManager {
                 e.printStackTrace();
             }
 
-            mCamera.setDisplayOrientation(90);
+//            mCamera.setDisplayOrientation(90);
+            setCameraDisplayOrientation(activity, mCameraID, mCamera);
             mCamera.startPreview();
+            mAutoFocusManager = new AutoFocusManager(mCamera);
             isPreviewing = true;
         }
+    }
+
+    public void setCameraDisplayOrientation(Activity activity,
+                                            int cameraId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        camera.setDisplayOrientation(result);
     }
 
 
@@ -175,13 +220,28 @@ public class CameraManager {
         return mCamera.getParameters().getPreviewSize();
     }
 
+    public Camera.Size doGetPictureSize() {
+        return mCamera.getParameters().getPictureSize();
+    }
+
     public void doStopCamera() {
+        if (mAutoFocusManager != null) {
+            mAutoFocusManager.stop();
+            mAutoFocusManager = null;
+        }
+
         if (null != mCamera) {
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();
             isPreviewing = false;
             mCamera.release();
             mCamera = null;
+        }
+    }
+
+    public void doTakePicture(Camera.PictureCallback callback) {
+        if (null != mCamera) {
+            mCamera.takePicture(null, null, callback);
         }
     }
 }
