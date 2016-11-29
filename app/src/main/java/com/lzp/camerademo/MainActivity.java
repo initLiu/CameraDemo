@@ -24,7 +24,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Environment;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -33,6 +33,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
 
@@ -40,7 +45,7 @@ import android.widget.ImageView;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback, View
         .OnClickListener, Camera.PictureCallback {
-    Camera mCamera;
+    private String path;
     SurfaceView mSurface;
     SurfaceHolder mHolder;
     private ImageView imgCpature, imgSwitch;
@@ -87,6 +92,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
             }
         }
         defaultCameraId = backCameraID;
+
+        path = Environment.getExternalStorageDirectory().getPath() + "/camerademo.jpg";
     }
 
     @Override
@@ -210,6 +217,18 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
             }
 
             Bitmap shot = Bitmap.createBitmap(rotaBitmap, x, y, DES_RECT_WIDTH, DES_RECT_HEIGHT);
+
+            try {
+                FileOutputStream fos = new FileOutputStream(path);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                shot.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                bos.flush();
+                bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
             if (!shot.isRecycled()) {
                 shot.recycle();
                 shot = null;
