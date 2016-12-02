@@ -69,12 +69,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-//        imgShot = (ImageView) findViewById(R.id.img);
-        imgCpature = (ImageView) findViewById(R.id.capture);
+//        imgCpature = (ImageView) findViewById(R.id.capture);
         imgSwitch = (ImageView) findViewById(R.id.switchBtn);
         markView = (MarkView) findViewById(R.id.mark);
         imgSwitch.setOnClickListener(this);
-        imgCpature.setOnClickListener(this);
+//        imgCpature.setOnClickListener(this);
 
         mSurface = (SurfaceView) findViewById(R.id.preview);
         mHolder = mSurface.getHolder();

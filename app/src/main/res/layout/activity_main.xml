@@ -23,19 +23,44 @@
         android:layout_marginTop="10dp"
         android:src="@drawable/switchbtn"/>
 
-    <LinearLayout
+    <com.lzp.camerademo.CameraLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/preview"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_below="@id/preview">
 
-        <ImageView
-            android:id="@+id/capture"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.lzp.camerademo.CustRadiaGroup
+            android:id="@+id/radiogroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/capture"/>
-    </LinearLayout>
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                android:background="@drawable/radio_button"/>
+
+            <RadioButton
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:gravity="center"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                android:background="@drawable/radio_button"/>
+
+        </com.lzp.camerademo.CustRadiaGroup>
+
+    </com.lzp.camerademo.CameraLayout>
 
 
 </RelativeLayout>
