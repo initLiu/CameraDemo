@@ -3,6 +3,7 @@ package com.lzp.camerademo;
 import android.app.Activity;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.media.MediaRecorder;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -24,6 +25,7 @@ public class CameraManager {
     private AutoFocusManager mAutoFocusManager;
     private Camera mCamera;
     private int mCameraID;
+    private boolean isRecord = false;
 
     private CameraManager() {
 
@@ -43,6 +45,14 @@ public class CameraManager {
     public void doOpenCamera(int cameraId) {
         mCameraID = cameraId;
         mCamera = Camera.open(cameraId);
+    }
+
+    public Camera getCamera() {
+        return mCamera;
+    }
+
+    public void setRecord(boolean record) {
+        isRecord = record;
     }
 
     public void doStartPreview(Activity activity, SurfaceHolder holder, int width, int height) {
@@ -81,10 +91,28 @@ public class CameraManager {
                 e.printStackTrace();
             }
 
+            //这个单独处理，因为有些手机设置自动聚焦会失败，如果放在上面，会导致其他设置也都失败.
+            try {
+                parameters = mCamera.getParameters();
+                //录制时使用系统设置自动聚焦
+                if (isRecord) {
+                    List<String> supportedFocusModes = parameters.getSupportedFocusModes();
+                    if (supportedFocusModes.contains(Camera.Parameters
+                            .FOCUS_MODE_CONTINUOUS_VIDEO)) {
+                        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+                        mCamera.setParameters(parameters);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
 //            mCamera.setDisplayOrientation(90);
             setCameraDisplayOrientation(activity, mCameraID, mCamera);
             mCamera.startPreview();
-            mAutoFocusManager = new AutoFocusManager(mCamera);
+            if (!isRecord) {
+                mAutoFocusManager = new AutoFocusManager(mCamera);
+            }
             isPreviewing = true;
         }
     }

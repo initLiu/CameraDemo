@@ -24,9 +24,11 @@
         android:src="@drawable/switchbtn"/>
 
     <com.lzp.camerademo.CameraLayout
+        android:id="@+id/cameraLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/preview">
+        android:layout_below="@id/preview"
+        android:background="#000000">
 
         <android.support.v4.view.ViewPager
             android:id="@+id/viewpage"
@@ -40,25 +42,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:gravity="center"
-                android:layout_marginLeft="3dp"
-                android:layout_marginRight="3dp"
-                android:background="@drawable/radio_button"/>
-
-            <RadioButton
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:gravity="center"
-                android:layout_marginLeft="3dp"
-                android:layout_marginRight="3dp"
-                android:background="@drawable/radio_button"/>
-
-        </com.lzp.camerademo.CustRadiaGroup>
+            android:orientation="horizontal"/>
 
     </com.lzp.camerademo.CameraLayout>
 

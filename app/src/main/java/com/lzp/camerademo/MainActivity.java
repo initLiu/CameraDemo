@@ -19,12 +19,21 @@ package com.lzp.camerademo;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -44,12 +53,13 @@ import java.io.IOException;
 // ----------------------------------------------------------------------
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback, View
-        .OnClickListener, Camera.PictureCallback {
+        .OnClickListener, Camera.PictureCallback, CameraLayout.CameraListen {
+
     private String path;
     SurfaceView mSurface;
     SurfaceHolder mHolder;
-    private ImageView imgCpature, imgSwitch;
-    private ImageView imgShot;
+    private ImageView imgSwitch;
+    private CameraLayout mCameraLayout;
     private boolean hasSurface = false;
     private int mPreviewWidth;
     private int mPreviewHeight;
@@ -69,11 +79,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-//        imgCpature = (ImageView) findViewById(R.id.capture);
+        mCameraLayout = (CameraLayout) findViewById(R.id.cameraLayout);
+        mCameraLayout.addCameraListener(this);
+
         imgSwitch = (ImageView) findViewById(R.id.switchBtn);
         markView = (MarkView) findViewById(R.id.mark);
         imgSwitch.setOnClickListener(this);
-//        imgCpature.setOnClickListener(this);
 
         mSurface = (SurfaceView) findViewById(R.id.preview);
         mHolder = mSurface.getHolder();
@@ -258,12 +269,43 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
             defaultCameraId = curCamID == backCameraID ? frontCameraId : backCameraID;
             CameraManager.getInstance().doStopCamera();
             openCameraRunnable.run();
-        } else if (v == imgCpature) {
-            if (mRectPicture == null) {
-                mRectPicture = createPictureRect();
-            }
-            imgCpature.setEnabled(false);
-            CameraManager.getInstance().doTakePicture(this);
+        }
+    }
+
+    @Override
+    public void onCaptrure(View view) {
+        if (mRectPicture == null) {
+            mRectPicture = createPictureRect();
+        }
+        view.setEnabled(false);
+        CameraManager.getInstance().doTakePicture(this);
+    }
+
+    @Override
+    public void onRecord(View view) {
+    }
+
+    @Override
+    public void onPageChanged(int position) {
+        if (position == 1) {//切换到了录制
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    CameraManager.getInstance().doStopCamera();
+                    CameraManager.getInstance().setRecord(true);
+                    openCameraRunnable.run();
+
+                }
+            }, 200);
+        } else if (position == 0) {//切换到了拍照
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    CameraManager.getInstance().doStopCamera();
+                    CameraManager.getInstance().setRecord(false);
+                    openCameraRunnable.run();
+                }
+            }, 200);
         }
     }
 

@@ -13,12 +13,14 @@ import java.util.ArrayList;
  * Created by SKJP on 2016/11/30.
  */
 
-public class CameraLayout extends RelativeLayout {
+public class CameraLayout extends RelativeLayout implements View.OnClickListener {
     private ViewPager mViewPage;
 
     private CustRadiaGroup mRadiaGroup;
 
     private CameraAdapter mPagerAdapter;
+
+    private CameraListen mCameraListener;
 
     public CameraLayout(Context context) {
         super(context);
@@ -36,12 +38,12 @@ public class CameraLayout extends RelativeLayout {
         mViewPage = (ViewPager) findViewById(R.id.viewpage);
         mRadiaGroup = (CustRadiaGroup) findViewById(R.id.radiogroup);
 
-        mPagerAdapter = new CameraAdapter(getContext());
+        mPagerAdapter = new CameraAdapter(getContext(), this);
         mViewPage.setAdapter(mPagerAdapter);
         mPagerAdapter.addViews(initPagerViews());
 
-//        mRadiaGroup.setViewPager(mViewPage);
-//        mRadiaGroup.syncButton();
+        mRadiaGroup.setViewPager(mViewPage);
+        mRadiaGroup.syncButton();
     }
 
     private ArrayList<View> initPagerViews() {
@@ -57,5 +59,35 @@ public class CameraLayout extends RelativeLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         init();
+    }
+
+    public void addCameraListener(CameraListen listen) {
+        mCameraListener = listen;
+        mRadiaGroup.addCameraListener(listen);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (mCameraListener == null) {
+            return;
+        }
+        switch (v.getId()) {
+            case R.id.capture:
+                mCameraListener.onCaptrure(v);
+                break;
+            case R.id.record:
+                mCameraListener.onRecord(v);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public interface CameraListen {
+        void onCaptrure(View view);
+
+        void onRecord(View view);
+
+        void onPageChanged(int position);
     }
 }

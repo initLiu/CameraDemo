@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,26 +18,31 @@ import java.util.List;
 public class CameraAdapter extends PagerAdapter {
     private List<View> mViews;
     private Context mContext;
+    private View.OnClickListener mClickListener;
 
-    public CameraAdapter(Context context) {
+    public CameraAdapter(Context context, View.OnClickListener clickListener) {
         mViews = new ArrayList<>();
         mContext = context;
+        mClickListener = clickListener;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         Log.e("Test", "instantiateItem");
         View view = mViews.get(position);
-        if (view == null) {
+        BaseHodler hodler = (BaseHodler) view.getTag();
+        if (hodler == null) {
+            hodler = new BaseHodler();
             if (position == 0) {
-                view = LayoutInflater.from(mContext).inflate(R.layout.take_picture, container,
-                        false);
+                hodler.imgBtn = (ImageView) view.findViewById(R.id.capture);
 
             } else if (position == 1) {
-                view = LayoutInflater.from(mContext).inflate(R.layout.record_video, container,
-                        false);
+                hodler.imgBtn = (ImageView) view.findViewById(R.id.record);
             }
+            hodler.imgBtn.setOnClickListener(mClickListener);
+            view.setTag(hodler);
         }
+
         if (view.getParent() != container && position < this.getCount()) {
             container.addView(view);
         }
@@ -75,5 +81,9 @@ public class CameraAdapter extends PagerAdapter {
             }
         }
         return pos;
+    }
+
+    class BaseHodler {
+        public ImageView imgBtn;
     }
 }

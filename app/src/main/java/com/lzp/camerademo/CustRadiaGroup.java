@@ -16,6 +16,7 @@ import android.widget.RadioGroup;
 
 public class CustRadiaGroup extends RadioGroup implements ViewPager.OnPageChangeListener {
     private ViewPager mPager;
+    private CameraLayout.CameraListen mListener;
 
     public CustRadiaGroup(Context context) {
         super(context);
@@ -32,6 +33,10 @@ public class CustRadiaGroup extends RadioGroup implements ViewPager.OnPageChange
 
     public void syncButton() {
         addRadioButton();
+        RadioButton button = (RadioButton) getChildAt(0);
+        if (button != null) {
+            button.setChecked(true);
+        }
     }
 
     private void addRadioButton() {
@@ -46,7 +51,7 @@ public class CustRadiaGroup extends RadioGroup implements ViewPager.OnPageChange
 
     private RadioButton createButton() {
         RadioButton button = new RadioButton(getContext());
-        button.setBackgroundResource(R.drawable.radio_button);
+        button.setButtonDrawable(R.drawable.radio_button);
         button.setGravity(Gravity.CENTER);
 
         float buttonWidthDip = 10f;
@@ -79,6 +84,9 @@ public class CustRadiaGroup extends RadioGroup implements ViewPager.OnPageChange
             if (position < getChildCount()) {
                 RadioButton button = (RadioButton) getChildAt(position);
                 button.setChecked(true);
+                if (mListener != null) {
+                    mListener.onPageChanged(position);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,5 +95,9 @@ public class CustRadiaGroup extends RadioGroup implements ViewPager.OnPageChange
 
     @Override
     public void onPageScrollStateChanged(int state) {
+    }
+
+    public void addCameraListener(CameraLayout.CameraListen listen) {
+        mListener = listen;
     }
 }
