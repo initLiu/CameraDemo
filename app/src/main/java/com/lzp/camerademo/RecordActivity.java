@@ -185,9 +185,10 @@ public class RecordActivity extends Activity implements SurfaceHolder.Callback, 
 
         mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        //https://developer.android.com/guide/appendix/media-formats.html
         mRecorder.setVideoSize(VIDEO_SIZE_WIDTH, VIDEO_SIZE_HEIGHT);
         mRecorder.setVideoFrameRate(DEFAULT_VIDEO_FRAME_RATE);
-        mRecorder.setAudioSamplingRate(DEFAULT_AUDIO_SAMPLE_RATE);
+        mRecorder.setAudioSamplingRate(DEFAULT_AUDIO_SAMPLE_RATE);//采样率，44100Hz是唯一可以保证兼容所有Android手机的采样率
         mRecorder.setAudioEncodingBitRate(DEFAULT_AUDIO_BIT_RATE);
         mRecorder.setAudioChannels(DEFAULT_AUDIO_CHANNEL);
         if (Build.VERSION.SDK_INT > 7) {
